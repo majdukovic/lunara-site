@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lunara: cycle syncing planner</title>
+  <meta name="description" content="Lunara turns your cycle into a daily guide for food, movement, work and rest, and shows the weeks ahead. Private by design.">
+  <meta property="og:title" content="Lunara: plan your life with your cycle">
+  <meta property="og:description" content="A daily guide and phase planner for every season of your cycle. Private by design.">
+  <meta property="og:image" content="/icon.png">
+  <link rel="icon" href="favicon.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <style>
+    :root { --bg:#FBF7F4; --surface:#fff; --ink:#2B2230; --muted:#7A6E80; --accent:#B4566F; --plum:#2A1838;
+            --men:#D9546E; --fol:#6FA58A; --ovu:#D99A3D; --lut:#8A6FB8; --line:rgba(43,34,48,.08); }
+    @media (prefers-color-scheme: dark) { :root { --bg:#16121A; --surface:#221C28; --ink:#F3ECF4; --muted:#A99DAF; --accent:#E38AA2; --line:rgba(243,236,244,.1); } }
+    * { box-sizing:border-box }
+    body { margin:0; background:var(--bg); color:var(--ink); font:17px/1.6 -apple-system, system-ui, "Segoe UI", Roboto, sans-serif; }
+    .wrap { max-width:1040px; margin:0 auto; padding:0 16px; }
+    h1,h2,h3 { font-family: ui-serif, "New York", Georgia, serif; font-weight:600; line-height:1.1; margin:0 0 12px; }
+    h1 { font-size:clamp(40px,7vw,68px); } h2 { font-size:clamp(28px,4.5vw,40px); } h3 { font-size:21px; }
+    p { margin:0 0 12px } .muted { color:var(--muted) } a { color:var(--accent) }
+    header { display:flex; align-items:center; gap:10px; padding:20px 0; }
+    header img { width:36px; height:36px; border-radius:9px } header b { font-family:ui-serif,Georgia,serif; font-size:22px }
+    header nav { margin-left:auto; display:flex; gap:18px; font-size:15px } header nav a { color:var(--muted); text-decoration:none }
+    .hero { display:grid; grid-template-columns:1.1fr .9fr; gap:40px; align-items:center; padding:48px 0 64px; }
+    .lead { font-size:20px; color:var(--muted); max-width:520px }
+    .cta { display:flex; flex-wrap:wrap; gap:12px; margin-top:24px }
+    .btn { display:inline-block; padding:13px 22px; border-radius:999px; background:var(--ink); color:var(--bg); text-decoration:none; font-weight:600 }
+    .btn.alt { background:transparent; color:var(--ink); border:1.5px solid var(--line) }
+    .phone { background:var(--surface); border-radius:36px; padding:22px; box-shadow:0 30px 80px rgba(42,24,56,.18); max-width:340px; margin-left:auto; border:1px solid var(--line) }
+    .ring { width:110px; height:110px; border-radius:50%; background:conic-gradient(var(--men) 0 18%, #0000 18% 100%); display:grid; place-items:center; position:relative }
+    .ring::before { content:""; position:absolute; inset:10px; border-radius:50%; background:var(--surface) }
+    .ring span { position:relative; font-family:ui-serif,Georgia,serif; font-size:36px; font-weight:700 }
+    .row { display:flex; gap:16px; align-items:center } .tag { font-size:12px; font-weight:700; letter-spacing:.12em; color:var(--men) }
+    .chip { display:inline-block; font-size:13px; padding:4px 10px; border-radius:999px; background:rgba(111,165,138,.18); margin:2px }
+    .mini { border-top:1px solid var(--line); margin-top:14px; padding-top:12px; font-size:14px }
+    section { padding:56px 0; border-top:1px solid var(--line) }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-top:24px }
+    .card { background:var(--surface); border-radius:20px; padding:22px; border:1px solid var(--line) }
+    .dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:8px; vertical-align:middle }
+    .seasons .card b { display:block; font-family:ui-serif,Georgia,serif; font-size:20px; margin-bottom:4px }
+    .timeline { display:flex; height:14px; border-radius:999px; overflow:hidden; margin:18px 0 6px }
+    .timeline i { display:block } .legend { display:flex; justify-content:space-between; font-size:13px; color:var(--muted) }
+    .price { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; margin-top:24px }
+    .price .card ul { padding-left:18px; margin:8px 0 0 } .price .card li { margin:4px 0 }
+    .price .plus { border:2px solid var(--accent) }
+    details { background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:14px 18px; margin:10px 0 }
+    summary { cursor:pointer; font-weight:600 }
+    footer { padding:40px 0 60px; color:var(--muted); font-size:14px; border-top:1px solid var(--line) }
+    @media (max-width:760px) { .hero { grid-template-columns:1fr } .phone { margin:0 auto } header nav { display:none } }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header><img src="icon.png" alt=""><b>Lunara</b>
+    <nav><a href="#guide">Daily guide</a><a href="#plan">Plan</a><a href="#privacy">Privacy</a><a href="#pricing">Pricing</a></nav>
+  </header>
+
+  <div class="hero">
+    <div>
+      <h1>Plan your life with your cycle, not against&nbsp;it.</h1>
+      <p class="lead">Lunara turns your cycle into a daily guide for what to eat, how to move, when to push at work and when to rest. It also shows the weeks ahead, so nothing catches you off guard.</p>
+      <div class="cta"><a class="btn" href="#download">Get Lunara free</a><a class="btn alt" href="#guide">See how it works</a></div>
+      <p class="muted" style="margin-top:14px;font-size:14px">iPhone and Android · Free · Works offline</p>
+    </div>
+    <div class="phone" aria-label="Lunara Today screen preview">
+      <div class="row"><div class="ring"><span>2</span></div>
+        <div><div class="tag">MENSTRUAL</div><h3 style="margin:2px 0">Inner winter</h3><div class="muted" style="font-size:14px">Period day 2</div></div></div>
+      <p style="margin-top:14px;font-size:15px">Energy is lowest now. Rest counts as productive today.</p>
+      <div class="mini"><b>Eat:</b> warm, iron-rich meals<br><span class="chip">Lentils</span><span class="chip">Spinach</span><span class="chip">Dark chocolate</span></div>
+      <div class="mini"><b>Work:</b> review and plan. Keep the calendar light.</div>
+      <div class="mini"><b>Tomorrow:</b> Day 3 · heads-up, you often log cramps.</div>
+    </div>
+  </div>
+
+  <section id="guide">
+    <h2>A daily guide that fits the day you're actually having</h2>
+    <p class="muted">Each phase changes your energy, appetite, focus and recovery. Lunara gives you one clear suggestion for each area, and the reason behind it.</p>
+    <div class="grid">
+      <div class="card"><h3>Eat</h3><p class="muted">Foods for your phase, from iron when you bleed to steady carbs when cravings hit.</p></div>
+      <div class="card"><h3>Move</h3><p class="muted">Push for a personal best when strength peaks. Choose low-impact movement when your body asks for it.</p></div>
+      <div class="card"><h3>Work</h3><p class="muted">Pitch when your confidence is high. Do detail work when focus turns inward.</p></div>
+      <div class="card"><h3>Rest</h3><p class="muted">Know when rest pays back as energy later, and protect your sleep before your period.</p></div>
+    </div>
+  </section>
+
+  <section id="plan" class="seasons">
+    <h2>Four seasons a month. One plan.</h2>
+    <p class="muted">See your phases with dates for the next six weeks. Each one comes with a checklist and a grocery list you can share.</p>
+    <div class="timeline" aria-hidden="true"><i style="flex:5;background:var(--men)"></i><i style="flex:8;background:var(--fol)"></i><i style="flex:3;background:var(--ovu)"></i><i style="flex:12;background:var(--lut)"></i></div>
+    <div class="legend"><span>Day 1</span><span>Day 14</span><span>Day 28</span></div>
+    <div class="grid">
+      <div class="card"><b><span class="dot" style="background:var(--men)"></span>Inner winter</b><span class="muted">Rest, reflect, replenish iron.</span></div>
+      <div class="card"><b><span class="dot" style="background:var(--fol)"></span>Inner spring</b><span class="muted">New ideas, new workouts, rising energy.</span></div>
+      <div class="card"><b><span class="dot" style="background:var(--ovu)"></span>Inner summer</b><span class="muted">Peak confidence. Pitch, present, connect.</span></div>
+      <div class="card"><b><span class="dot" style="background:var(--lut)"></span>Inner autumn</b><span class="muted">Finish, organise, set boundaries.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>It learns your patterns</h2>
+    <p class="muted">Log in seconds: flow, a 0–10 pain scale and more than 50 symptoms, from cervical mucus to work stress. When a symptom keeps coming back on the same cycle days, Lunara notices and gives you a heads-up before it returns.</p>
+    <div class="grid">
+      <div class="card"><h3>Pattern heads-ups</h3><p class="muted">"You often log headaches around day 26." Shown before it happens, not after.</p></div>
+      <div class="card"><h3>Insights by phase</h3><p class="muted">Energy, mood, sleep and pain by phase, plus your longest and shortest cycles.</p></div>
+      <div class="card"><h3>Reminders</h3><p class="muted">A daily check-in, a heads-up two days before your period and a note when a new phase starts.</p></div>
+    </div>
+  </section>
+
+  <section id="privacy">
+    <h2>Your cycle is your business</h2>
+    <div class="grid">
+      <div class="card"><h3>Offline first</h3><p class="muted">No account needed. Your data lives on your phone.</p></div>
+      <div class="card"><h3>No AI on your health data</h3><p class="muted">Predictions and patterns are calculated on your device, with rules you can read.</p></div>
+      <div class="card"><h3>No ads, no selling</h3><p class="muted">No session recording, no ad trackers, and your data is never sold.</p></div>
+      <div class="card"><h3>Delete any time</h3><p class="muted">Export a PDF or JSON copy, or erase everything on your phone with one tap.</p></div>
+    </div>
+  </section>
+
+  <section id="pricing">
+    <h2>Simple pricing</h2>
+    <div class="price">
+      <div class="card"><h3>Free</h3><p class="muted">Everything in Lunara 1.0, with no ads and no account.</p>
+        <ul><li>Period, symptoms, pain, mood, sleep</li><li>Predictions and fertile window</li><li>Today's phase, mantra and guide</li><li>Reminders</li></ul></div>
+      <div class="card plus"><h3>Also free in 1.0</h3><p class="muted">The planning and insight tools.</p>
+        <ul><li>Phase planner with checklists and groceries</li><li>Pattern detection and heads-ups</li><li>Full insights and PDF cycle report</li><li>Home-screen widget</li></ul></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Questions</h2>
+    <details><summary>Is Lunara a contraceptive or medical device?</summary><p class="muted">No. Predictions are estimates and must not be used as birth control. Talk to a healthcare professional about medical concerns.</p></details>
+    <details><summary>Does it work on hormonal birth control?</summary><p class="muted">Yes. Lunara notes that bleeds are withdrawal bleeds and that phases are estimates, and you can still track symptoms and patterns.</p></details>
+    <details><summary>What if my cycle is irregular?</summary><p class="muted">Predictions adapt to the gaps you actually log, and the Insights screen shows your longest and shortest cycles.</p></details>
+    <details><summary>Where is my data stored?</summary><p class="muted">Only on your phone. Lunara 1.0 has no account and no cloud, so your cycle data never leaves your device unless you export it.</p></details>
+  </section>
+
+  <section id="download">
+    <h2>Start with today</h2>
+    <p class="muted">Coming soon to the App Store and Google Play.</p>
+  </section>
+
+  <footer>© 2026 Singularity Industries · <a href="privacy.html">Privacy</a> · <a href="support.html">Support</a> · <a href="terms.html">Terms</a> · Lunara offers general wellness information. It isn't medical advice or contraception.</footer>
+</div>
+</body>
+</html>
